@@ -2,7 +2,6 @@
   <div>
     <q-table
       class="my-sticky-virtscroll-table"
-      virtual-scroll
       flat
       bordered
       style="height: 90vh"
@@ -20,16 +19,48 @@
       <template v-slot:loading>
         <q-inner-loading showing color="primary" />
       </template>
+      <template v-slot:header="props">
+        <Draggable
+          tag="tr"
+          class="q-tr"
+          v-model="props.cols"
+          item-key="order"
+          ghost-class="ghost"
+          handle=".handle"
+          drag-class="column-drag"
+          @change="onColumnOrderChange"
+        >
+          <template #item="{ element }">
+            <th
+              class="handle table-column-header"
+              :class="{
+                'text-left': element.align == 'left',
+                'text-right': element.align == 'right',
+              }"
+            >
+              <span><q-icon name="drag_indicator" size="xs" /></span>
+              {{ element.label }}
+            </th>
+          </template>
+        </Draggable>
+      </template>
       <template v-slot:top="props">
-        <div class="col-2 q-table__title">Contacts</div>
+        <div class="col-2 q-table__title table-title">Contacts</div>
 
         <q-space />
 
         <div v-if="$q.screen.gt.sm" class="col">
-          <q-toggle v-model="visibleCols" val="name" label="Name" />
-          <q-toggle v-model="visibleCols" val="age" label="Age" />
-          <q-toggle v-model="visibleCols" val="phone" label="Phone" />
-          <q-toggle v-model="visibleCols" val="email" label="Email" />
+          <q-toggle
+            v-for="field in fields"
+            :key="field"
+            :val="field"
+            :label="field"
+            color="green"
+            checked-icon="check"
+            unchecked-icon="clear"
+            v-model="visibleCols"
+            @update:model-value="() => toggleColumnVisibility(field)"
+          />
         </div>
         <q-select
           v-else
@@ -45,12 +76,15 @@
           :options="columns"
           option-value="name"
           style="min-width: 150px"
+          @update:model-value="onVisibleColumnsChange"
         />
 
         <q-input
           style="margin: 0 10px; width: 150px"
           dense
           debounce="300"
+          label="Search"
+          standout="bg-green text-white"
           v-model="filter"
           placeholder="Search"
         >
@@ -92,37 +126,49 @@ export default {
     const columns = ref(tableStore.columns);
     const visibleCols = ref(tableStore.visibleColumns);
     const filter = ref("");
+    const fields = ref(["name", "age", "phone", "email"]);
     const pagination = ref({
       rowsPerPage: 0,
     });
 
+    // Dummy loading table.
     let loading = ref(true);
-
-    const onDragEnd = (event) => {
-      tableStore.updateColumnOrder(event.newIndex, event.oldIndex);
-    };
+    setTimeout(() => {
+      loading.value = false;
+    }, 3000);
+    // loading end
 
     const isColumnVisible = (column) => {
       return tableStore.visibleColumns.includes(column);
     };
 
-    const toggleColumnVisibility = (column) => {
-      tableStore.toggleColumnVisibility(column);
+    const toggleColumnVisibility = (tag) => {
+      tableStore.toggleColumnVisibility(tag);
     };
 
-    setTimeout(() => {
-      loading.value = false;
-    }, 3000);
+    const onColumnOrderChange = (evt) => {
+      let item = evt.moved;
+
+      if (!item) return;
+
+      tableStore.updateColumnOrder(item.newIndex, item.oldIndex);
+    };
+
+    const onVisibleColumnsChange = (evt) => {
+      tableStore.updatedVisibleColumns(evt);
+    };
 
     return {
       columns,
-      onDragEnd,
       isColumnVisible,
       toggleColumnVisibility,
       visibleCols,
       pagination,
       filter,
       loading,
+      onColumnOrderChange,
+      onVisibleColumnsChange,
+      fields
     };
   },
 };
@@ -131,6 +177,21 @@ export default {
 <style lang="sass">
 #app
   padding: 8px
+
+.table-column-header.ghost
+  background: #ddd !important
+
+.column-drag
+  border: 1px solid #000
+
+.table-title, .table-column-header
+  font-weight: bold
+
+.handle, .handle:hover
+  cursor: grab
+
+.handle:active, .handle:focus
+  cursor: grabbing
 
 .my-sticky-virtscroll-table
   height: 200px

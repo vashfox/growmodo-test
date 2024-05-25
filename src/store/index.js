@@ -3,20 +3,20 @@ import { defineStore } from "pinia";
 const columnSets = [
   {
     name: "name",
-    label: "Name",
     align: "left",
+    label: "Name",
     field: "name",
-    sortable: true,
+    order: 0,
   },
   {
     name: "age",
-    align: "center",
+    align: "left",
     label: "Age",
     field: "age",
-    sortable: true,
+    order: 1,
   },
-  { name: "phone", label: "Phone", align: "right", field: "phone" },
-  { name: "email", label: "Email", align: "right", field: "email" },
+  { name: "phone", label: "Phone", align: "left", field: "phone", order: 2 },
+  { name: "email", label: "Email", align: "left", field: "email", order: 3 },
 ];
 
 export const useTableStore = defineStore("table", {
@@ -26,16 +26,22 @@ export const useTableStore = defineStore("table", {
   }),
   actions: {
     toggleColumnVisibility(column) {
-      if (this.visibleColumns.includes(column.field)) {
+      if (this.visibleColumns.includes(column)) {
         this.visibleColumns = this.visibleColumns.filter(
           (col) => col !== column
         );
       } else {
-        this.visibleColumns.push(column.field);
+        this.visibleColumns.push(column);
       }
     },
+    updatedVisibleColumns(columns) {
+      this.visibleColumns = columns;
+    },
     updateColumnOrder(newIndex, oldIndex) {
+      console.log(this.columns, this.visibleColumns);
+      console.log(newIndex, oldIndex);
       const movedColumn = this.columns.splice(oldIndex, 1)[0];
+      console.log(movedColumn)
       this.columns.splice(newIndex, 0, movedColumn);
     },
   },
