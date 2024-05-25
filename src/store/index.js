@@ -21,7 +21,7 @@ const columnSets = [
 
 export const useTableStore = defineStore("table", {
   state: () => ({
-    columns: columnSets,
+    columns: [...columnSets],
     visibleColumns: ["name", "age", "phone", "email"],
   }),
   actions: {
@@ -37,11 +37,8 @@ export const useTableStore = defineStore("table", {
     updatedVisibleColumns(columns) {
       this.visibleColumns = columns;
     },
-    updateColumnOrder(newIndex, oldIndex) {
-      console.log(this.columns, this.visibleColumns);
-      console.log(newIndex, oldIndex);
+    updateColumnOrder({ newIndex, oldIndex }) {
       const movedColumn = this.columns.splice(oldIndex, 1)[0];
-      console.log(movedColumn)
       this.columns.splice(newIndex, 0, movedColumn);
     },
   },

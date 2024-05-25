@@ -147,11 +147,7 @@ export default {
     };
 
     const onColumnOrderChange = (evt) => {
-      let item = evt.moved;
-
-      if (!item) return;
-
-      tableStore.updateColumnOrder(item.newIndex, item.oldIndex);
+      tableStore.updateColumnOrder(evt.moved);
     };
 
     const onVisibleColumnsChange = (evt) => {
@@ -168,7 +164,7 @@ export default {
       loading,
       onColumnOrderChange,
       onVisibleColumnsChange,
-      fields
+      fields,
     };
   },
 };
