@@ -1,7 +1,16 @@
-# Vue 3 + Vite
+# Vue 3 Project with Vite 
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+This is a basic Vue 3 project setup using Vite.
 
-## Recommended IDE Setup
+## Installation
 
-- [VS Code](https://code.visualstudio.com/) + [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (previously Volar) and disable Vetur
+1. Clone this repository.
+2. Navigate into the project directory: `cd growmodo-test`.
+3. Install dependencies:
+
+```bash
+npm install
+
+```bash
+npm run dev
+
