@@ -1,18 +1,19 @@
 <template>
   <div>
     <q-table
-      class="my-sticky-virtscroll-table"
       flat
       bordered
-      style="height: 90vh"
       row-key="name"
+      title="Contacts"
+      style="height: 90vh"
+      class="my-sticky-virtscroll-table"
       v-model:pagination="pagination"
       :virtual-scroll-item-size="48"
       :virtual-scroll-sticky-size-start="200"
       :dense="$q.screen.lt.md"
       :visible-columns="visibleCols"
       :rows="rows"
-      :columns="columns"
+      :columns="tableStore.orderedColumns"
       :loading="loading"
       :filter="filter"
     >
@@ -24,7 +25,7 @@
           tag="tr"
           class="q-tr"
           v-model="props.cols"
-          item-key="order"
+          item-key="field"
           ghost-class="ghost"
           handle=".handle"
           drag-class="column-drag"
@@ -32,34 +33,42 @@
         >
           <template #item="{ element }">
             <th
-              class="handle table-column-header"
+              class="table-column-header"
               :class="{
                 'text-left': element.align == 'left',
                 'text-right': element.align == 'right',
               }"
             >
-              <span><q-icon name="drag_indicator" size="xs" /></span>
+              <span v-if="enableDragging" class="handle">
+                <q-icon name="drag_indicator" size="xs" />
+              </span>
               {{ element.label }}
             </th>
           </template>
         </Draggable>
       </template>
-      <template v-slot:top="props">
-        <div class="col-2 q-table__title table-title">Contacts</div>
-
+      <template v-slot:top-right="props">
+        <q-toggle
+          v-model="enableDragging"
+          checked-icon="check"
+          color="green"
+          class="gap-right"
+          label="Allow Column Reordering"
+          unchecked-icon="clear"
+        />
         <q-space />
-
         <q-select
-          v-model="visibleCols"
           multiple
           filled
           dense
-          :display-value="$q.lang.table.columns"
           emit-value
           map-options
-          :options="columns"
+          class="col gap-right"
           option-value="name"
           style="min-width: 150px"
+          v-model="visibleCols"
+          :options="columns"
+          :display-value="$q.lang.table.columns"
           @update:model-value="onVisibleColumnsChange"
         >
           <template v-slot:option="{ itemProps, opt, selected, toggleOption }">
@@ -78,8 +87,9 @@
         </q-select>
 
         <q-input
-          style="margin: 0 10px; width: 150px"
+          style="width: 150px"
           dense
+          class="col"
           debounce="300"
           label="Search Name"
           standout="bg-green text-white"
@@ -92,6 +102,7 @@
         </q-input>
 
         <q-btn
+          v-if="$q.screen.gt.xs"
           flat
           round
           dense
@@ -124,6 +135,7 @@ export default {
     const columns = ref(tableStore.columns);
     const visibleCols = ref(tableStore.visibleColumns);
     const filter = ref("");
+    const enableDragging = ref(true);
     const pagination = ref({
       rowsPerPage: 0,
     });
@@ -140,6 +152,7 @@ export default {
     };
 
     const onColumnOrderChange = (evt) => {
+      if (!evt || !evt.moved) return;
       tableStore.updateColumnOrder(evt.moved);
     };
 
@@ -156,15 +169,14 @@ export default {
       loading,
       onColumnOrderChange,
       onVisibleColumnsChange,
+      enableDragging,
+      tableStore
     };
   },
 };
 </script>
 
 <style lang="sass">
-#app
-  padding: 8px
-
 .table-column-header.ghost
   background: #ddd !important
 
@@ -179,6 +191,9 @@ export default {
 
 .handle:active, .handle:focus
   cursor: grabbing
+
+.gap-right 
+  margin-right: 10px
 
 .my-sticky-virtscroll-table
   height: 200px
