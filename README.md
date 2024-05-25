@@ -11,6 +11,4 @@ This is a basic Vue 3 project setup using Vite.
 ```bash
 npm install
 
-```bash
 npm run dev
-

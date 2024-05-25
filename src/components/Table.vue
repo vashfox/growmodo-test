@@ -49,27 +49,11 @@
 
         <q-space />
 
-        <div v-if="$q.screen.gt.sm" class="col">
-          <q-toggle
-            v-for="field in fields"
-            :key="field"
-            :val="field"
-            :label="field"
-            color="green"
-            checked-icon="check"
-            unchecked-icon="clear"
-            v-model="visibleCols"
-            @update:model-value="() => toggleColumnVisibility(field)"
-          />
-        </div>
         <q-select
-          v-else
           v-model="visibleCols"
           multiple
-          flat
-          borderless
+          filled
           dense
-          options-dense
           :display-value="$q.lang.table.columns"
           emit-value
           map-options
@@ -77,7 +61,21 @@
           option-value="name"
           style="min-width: 150px"
           @update:model-value="onVisibleColumnsChange"
-        />
+        >
+          <template v-slot:option="{ itemProps, opt, selected, toggleOption }">
+            <q-item v-bind="itemProps">
+              <q-item-section>
+                <q-item-label v-html="opt.label" />
+              </q-item-section>
+              <q-item-section side>
+                <q-toggle
+                  :model-value="selected"
+                  @update:model-value="toggleOption(opt)"
+                />
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
 
         <q-input
           style="margin: 0 10px; width: 150px"
@@ -126,7 +124,6 @@ export default {
     const columns = ref(tableStore.columns);
     const visibleCols = ref(tableStore.visibleColumns);
     const filter = ref("");
-    const fields = ref(["name", "age", "phone", "email"]);
     const pagination = ref({
       rowsPerPage: 0,
     });
@@ -142,10 +139,6 @@ export default {
       return tableStore.visibleColumns.includes(column);
     };
 
-    const toggleColumnVisibility = (tag) => {
-      tableStore.toggleColumnVisibility(tag);
-    };
-
     const onColumnOrderChange = (evt) => {
       tableStore.updateColumnOrder(evt.moved);
     };
@@ -157,14 +150,12 @@ export default {
     return {
       columns,
       isColumnVisible,
-      toggleColumnVisibility,
       visibleCols,
       pagination,
       filter,
       loading,
       onColumnOrderChange,
       onVisibleColumnsChange,
-      fields,
     };
   },
 };

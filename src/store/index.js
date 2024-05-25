@@ -1,39 +1,40 @@
 import { defineStore } from "pinia";
 
-const columnSets = [
-  {
-    name: "name",
-    align: "left",
-    label: "Name",
-    field: "name",
-    order: 0,
-  },
-  {
-    name: "age",
-    align: "left",
-    label: "Age",
-    field: "age",
-    order: 1,
-  },
-  { name: "phone", label: "Phone", align: "left", field: "phone", order: 2 },
-  { name: "email", label: "Email", align: "left", field: "email", order: 3 },
-];
-
 export const useTableStore = defineStore("table", {
   state: () => ({
-    columns: [...columnSets],
+    columns: [
+      {
+        name: "name",
+        align: "left",
+        label: "Name",
+        field: "name",
+        order: 0,
+      },
+      {
+        name: "age",
+        align: "left",
+        label: "Age",
+        field: "age",
+        order: 1,
+      },
+      {
+        name: "phone",
+        label: "Phone",
+        align: "left",
+        field: "phone",
+        order: 2,
+      },
+      {
+        name: "email",
+        label: "Email",
+        align: "left",
+        field: "email",
+        order: 3,
+      },
+    ],
     visibleColumns: ["name", "age", "phone", "email"],
   }),
   actions: {
-    toggleColumnVisibility(column) {
-      if (this.visibleColumns.includes(column)) {
-        this.visibleColumns = this.visibleColumns.filter(
-          (col) => col !== column
-        );
-      } else {
-        this.visibleColumns.push(column);
-      }
-    },
     updatedVisibleColumns(columns) {
       this.visibleColumns = columns;
     },
