@@ -81,7 +81,7 @@
           style="margin: 0 10px; width: 150px"
           dense
           debounce="300"
-          label="Search"
+          label="Search Name"
           standout="bg-green text-white"
           v-model="filter"
           placeholder="Search"
